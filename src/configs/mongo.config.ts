@@ -8,7 +8,7 @@ export const getMongoConfig = async (configService: ConfigService): Promise<Mong
         useUnifiedTopology: true,
     }
 };
-//mongodb://admin:admin@localhost:27017/admin
+
 const getMongoConnectStr = (configService: ConfigService):string => {
     const user = configService.get('MONGO_LOGIN');
     const password = configService.get('MONGO_PASSWORD');
