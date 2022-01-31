@@ -58,7 +58,7 @@ export class AuthService {
 
     async validateUserPassword(params: SignInParams): Promise<string> {
         const { email, password } = params;
-        const user = await this.userModel.findOne({email}).exec();
+        const user = await this.userModel.findOne({email});
 
         if (user && (await user.validatePassword(password))) {
             return user.name;
