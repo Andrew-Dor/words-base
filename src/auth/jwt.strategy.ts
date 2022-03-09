@@ -5,6 +5,7 @@ import { IJwtPayload } from './auth.types';
 import { User, UserModel } from './user.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -13,7 +14,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         private readonly userModel: ReturnModelType<typeof UserModel>,
     ) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
+                return request?.cookies?.Authentication;
+            }]),
             ignoreExpiration: false,
             secretOrKey: process.env.JWT_SECRET,
         });

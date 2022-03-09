@@ -1,8 +1,8 @@
 import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { AccessTokenObject, CreateUserParams, SignInParams } from './auth.model';
-import { UserModel } from './user.entity';
+import { AccessTokenObject, CreateUserParams, SignInParams, UserType } from './auth.model';
+import { User, UserModel } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { ErrorCodes } from 'src/utils/constants';
 import { IJwtPayload } from './auth.types';
@@ -44,24 +44,24 @@ export class AuthService {
         }
     }
 
-    async signIn(params: SignInParams): Promise<AccessTokenObject> {
-        const username = await this.validateUserPassword(params);
-        if (!username) {
+    async signIn(params: SignInParams): Promise<AccessTokenObject & {user: UserType}> {
+        const user = await this.validateUserPassword(params);
+        if (!user) {
             throw new UnauthorizedException('Invalid email or password');
         }
 
-        const payload: IJwtPayload = { username, email: params.email };
+        const payload: IJwtPayload = { username: user.name, email: params.email };
         const accessToken = await this.jwtService.sign(payload);
 
-        return { accessToken };
+        return { accessToken, user: {email: user.email, name: user.name}  };
     }
 
-    async validateUserPassword(params: SignInParams): Promise<string> {
+    async validateUserPassword(params: SignInParams): Promise<User> {
         const { email, password } = params;
         const user = await this.userModel.findOne({email});
 
         if (user && (await user.validatePassword(password))) {
-            return user.name;
+            return user;
         }
         return null;
     }

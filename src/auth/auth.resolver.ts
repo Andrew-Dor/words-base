@@ -1,11 +1,15 @@
-import { Args, Context, GqlExecutionContext, GraphQLExecutionContext, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { AccessTokenObject, CreateUserParams, SignInParams, UserType } from './auth.model';
+import { ConfigService } from '@nestjs/config';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { CreateUserParams, SignInParams, UserType } from './auth.model';
 import { AuthService } from './auth.service';
 
 
 @Resolver(() => UserType)
 export class AuthResolver {
-    constructor(private authService: AuthService) {}
+    constructor(
+        private authService: AuthService,
+        private configService: ConfigService
+    ) { }
 
     @Mutation(() => Boolean, { name: 'signUp' })
     async signUp(
@@ -15,29 +19,20 @@ export class AuthResolver {
         return await this.authService.signUp(params);
     }
 
-    // @Query(() => AccessTokenObject, { name: 'signIn' })
-    // async signIn(
-    //     @Args('params', { type: () => SignInParams })
-    //     params: SignInParams,
-    // ) {
-    //     return await this.authService.signIn(params);
-    // }
-
-    @Query(() => Boolean, { name: 'signIn' })
+    @Query(() => UserType, { name: 'signIn' })
     async signIn(
         @Args('params', { type: () => SignInParams })
         params: SignInParams,
-        @Context() 
-        context: any
+        @Context()
+        context: any,
     ) {
-        const {accessToken}: AccessTokenObject = await this.authService.signIn(params);
-
-        context.res.cookie('token', accessToken, {
+        const { accessToken, user } = await this.authService.signIn(params);
+        
+        context.res.cookie('Authentication', accessToken, {
             httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24 * 31,
-          });
-          console.log('RESP',context);
-          
-        return true;
+            maxAge: this.configService.get('JWT_EXPIRES'),
+        });
+
+        return user;
     }
 }
