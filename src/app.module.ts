@@ -4,13 +4,19 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
 import { getMongoConfig } from './configs/mongo.config';
 import { AuthModule } from './auth/auth.module';
+import { DictionaryModule } from './dictionary/dictionary.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     GraphQLModule.forRoot({
       autoSchemaFile: true,
-      context: ({ req }) => ({ req }),
+      context: ({ req, res }) => ({ req, res }),
+      cors: {
+        origin: 'http://localhost:4000',
+        credentials: true,
+      }
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -18,6 +24,8 @@ import { AuthModule } from './auth/auth.module';
       useFactory: getMongoConfig,
     }),
     AuthModule,
+    DictionaryModule,
+    UserModule,
   ],
 })
 export class AppModule {}

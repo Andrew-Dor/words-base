@@ -9,8 +9,8 @@ import {
 
 @ObjectType('User')
 export class UserType {
-    @Field(() => ID)
-    id: string;
+    // @Field(() => ID)
+    // id: string;
 
     @Field()
     name: string;
@@ -18,8 +18,8 @@ export class UserType {
     @Field()
     email: string;
 
-    @Field()
-    password: string;
+    // @Field()
+    // password: string;
 }
 
 @InputType()
