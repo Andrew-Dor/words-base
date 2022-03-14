@@ -35,4 +35,13 @@ export class AuthResolver {
 
         return user;
     }
+
+    @Query(()=>Boolean, {name: 'logOut'})
+    async logOut(
+        @Context()
+        context: any,
+    ) {
+        context.res.cookie('Authentication',this.authService.clearAuthCookie());
+        return true;
+    }
 }

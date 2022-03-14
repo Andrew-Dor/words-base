@@ -66,5 +66,8 @@ export class AuthService {
         return null;
     }
 
+    clearAuthCookie() {
+        return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+    }
 
 }
