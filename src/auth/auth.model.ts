@@ -1,4 +1,4 @@
-import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, ID, InputType, ObjectType, registerEnumType } from '@nestjs/graphql';
 import {
     IsEmail,
     IsString,
@@ -6,20 +6,20 @@ import {
     MaxLength,
     MinLength,
 } from 'class-validator';
+import { UserRoles } from 'src/utils/constants';
+
+registerEnumType(UserRoles,{name: 'UserRoles'});
 
 @ObjectType('User')
 export class UserType {
-    // @Field(() => ID)
-    // id: string;
-
     @Field()
     name: string;
 
     @Field()
     email: string;
 
-    // @Field()
-    // password: string;
+    @Field(() => UserRoles)
+    role: UserRoles;
 }
 
 @InputType()
